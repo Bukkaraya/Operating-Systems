@@ -1,0 +1,22 @@
+Name:
+ID:
+
+Experiment 1. Thread and Process Creation
+
+Q1)
+Ans:
+
+Experiment 2. Process Management 
+
+Q2)
+Ans:
+
+Experiment 3. Processes vs Threads
+
+Q3)
+Ans:
+
+Experiment 4. The Counting Problem
+
+Q4)
+Ans:
