@@ -1,22 +1,88 @@
-Name:
-ID:
+Name: Abinav Bukkaraya Samudram
+ID: 0951030
 
 Experiment 1. Thread and Process Creation
 
 Q1)
-Ans:
+Ans: 
+
+Threads:
+Thr_create.c measures the average time taken to create threads. It creates 250 threads and measures the average time taken per thread. This program was executed multiple times and the results for three executions are presented below:
+1. Avg thr_create time = 12.960000 microsec
+2. Avg thr_create time = 15.328000 microsec
+3. Avg thr_create time = 12.824000 microsec
+
+Processes:
+Fork.c is similar to the program that creates threads, but in this the program creates multiple processes and measures the average time to create a process. This program also creates 250 processes and calculates the average time to create one process. To observe the true behavior of this program it was executed multiple times. The results for 3 executions are present below:
+1. Avg fork time =137.224000 microsec
+2. Avg fork time =100.368000 microsec
+3. Avg fork time =126.984000 microsec
+
+Based on the results from both programs, threads are created much faster compared to processes. This is because threads are light weight processes and all the threads exist within the same memory space. For each process created a PCB has to be allocated in memory and this increases the creation time.
+
 
 Experiment 2. Process Management 
 
 Q2)
 Ans:
 
+Process Management
+
+In this program, the fork() function is called in loop that executes for two iterations. The process ID of the running process is printed before the loop and after the loop. The process ID of the currently running process can be obtained using the getpid() function. “hello” is also printed before, after and inside the loop. 
+
+Although the loop is executed only twice, four processes are created. 
+1. In the first iteration the process P0 creates a child process P1 and both continue to execute
+2. Since two process are both running the second iteration of the loop, process P0 creates a child process P2 and process P1 creates a child process P3
+In total we have 4 processes created by the program with the follow hierarchy:
+
+     P0
+    / \
+   /   \
+  P1    P2
+ /     
+P3
+
+In total the string “hello” is printed 11 times. They are briefly explained below:
+- The first “hello” comes from the print statement before the loop starts
+- For each iteration in the loop, the parent prints “hello”, and the child prints “hello”
+o For the first iteration 2 “hello” statements are printed from P1 (child) and P0 (parent)
+o For the second iteration 4 “hello” statements are printed from P0 and P1 (parents), and P2 and P3 (children)
+- Finally 4 “hello” statements are printed after the loop, since there are 4 processes after the loops
+
+
 Experiment 3. Processes vs Threads
 
 Q3)
 Ans:
 
+Both files perform the same task but one uses processes and the other threads. 
+
+Thread Sharing
+
+For this program a single thread is created. The thread runs the proc() function which loops 5 million times. It also prints the iteration number of the loop along with the shared number value when the counter is divisible by 10000. The main program runs a loop which sleeps for a random amount of time and then increases the shared_number variable by 2. This loop executes for 50 iterations. After running the program multiple times for different seeds, the following observations were made:
+
+- Initially the thread prints out the iteration number of the loop and the shared_number value which is 1.
+- When the main program is done sleeping it increases the shared_number value by 2 and sleeps for a random time again
+- The thread prints the updated value of the shared_number
+- This occurs until the thread and main loop are both finished
+
+The shared_number variable created at the top of the file is shared_between the main thread and the child thread. 
+
+Process Sharing
+
+This program performs the same task as the thread sharing program. The main process sleeps for a random time and increases the shared_number value, whereas the child process prints the value of it’s loop counter and the shared_number value. The program was run multiple times and the following observations were made:
+- Initially the process prints out the iteration number of the loop and the shared_number value which is 1.
+- When the main process is done sleeping it increases the shared_number value by 2 and sleeps for a random time again
+- The child process prints the iteration counter of the loop and the shared_number value of 1
+- As the program continues to run the child process always prints a shared_number value of 1
+- The child and main processes are run until completion
+
+Here the shared_number value that was updated in the main process does not change the shared_number value in the child process. Each process has it’s own memory space and data is not shared between two processes. When a child process is created it duplicates the variables with the same values as its parent in a different memory location. The shared_number value updated by the main process is at a different memory location than the shared_number value of the child process.
+
+
 Experiment 4. The Counting Problem
 
 Q4)
 Ans:
+
+The program ibadcnt.c creates two threads than both increase the variable cnt exactly NITER times. When NITER is set to 1000000, the expected output is 2000000, as each thread is expected to increase the counter by a value of 1000000. However, when the program is executed multiple times, the value of cnt rarely reaches the expected value of 2000000. This is because both threads are accessing the same shared resource with any protection mechanism. Both threads may access the cnt variable at the same time (or when it has the same value), causing the threads to update it to the same value twice. For example, if thread 1 and thread 2 both access cnt when its value is 2. Thread 1 will update cnt to 3 and Thread 2 will also update the cnt value to 3. This causes the final value of cnt to be less than the expected 2000000. This issue can be resolved by using resource protection mechanisms such as semaphore or mutexs.
