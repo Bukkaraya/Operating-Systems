@@ -98,7 +98,7 @@ void *getFromBack(List *list){
 void printForward(List *list){
     if(list != NULL){
         if(list->head == NULL){
-            printf("List is empty.");
+            return;
         }else{
             Node *cur = list->head;
             while(cur != NULL){

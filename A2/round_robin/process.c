@@ -8,6 +8,8 @@ Process* createProcess(int id, int arrivalTime, int runTime, Queue* exhangeTimes
     proc->id = id;
     proc->arrivalTime = arrivalTime;
     proc->runTime = runTime;
+    proc->exchangeTimes = exhangeTimes;
+    proc->numWaitTimes = getCount(proc->exchangeTimes);
 
     return proc;
 }
@@ -22,16 +24,43 @@ int getTotalRunTime(Process *p) {
     return totalRunTime;
 }
 
+void printInt(void* d) {
+    int value = *((int *) d);
+    printf("Wait Time: %d\n", value);
+}
+
+void deleteInt(void *d) {
+    if(d != NULL) {
+        free(d);
+    }
+}
+
+
+int compareInt(const void* a, const void* b) {
+    int num1 = *((int *) a);
+    int num2 = *((int *) b);
+
+    if (num1 > num2) {
+        return 1;
+    } else if (num1 == num2) {
+        return 0;
+    } else {
+        return -1;
+    }
+}
+
+
 void printProcess(void* p) {
     Process *proc = (Process *) p;
-    printf("Process<ID: %d, AT: %d, RT: %d>\n", proc->id,
-        proc->arrivalTime, proc->runTime);
+    printf("Process<ID: %d, AT: %d, RT: %d, NWT: %d>\n", proc->id,
+        proc->arrivalTime, proc->runTime, proc->numWaitTimes);
 }
 
 void deleteProcess(void *p) {
     if (p != NULL) {
         free(p);
     }
+    // Add delete for wait time queue as well
 }
 
 int compareProcess(const void* p1, const void* p2) {

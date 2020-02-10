@@ -2,7 +2,7 @@
 #define _CPU_
 
 typedef struct cpu {
-    int pid;
+    Process* proc;
     int remainingTime;
 } cpu;
 

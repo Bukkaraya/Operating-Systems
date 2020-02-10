@@ -72,7 +72,11 @@ void destroyQueue(Queue *q){
 
 
 int getCount(Queue *q){
-    return q->count;
+    if (q != NULL) {
+        return q->count;
+    }
+    
+    return 0;
 }
 
 
