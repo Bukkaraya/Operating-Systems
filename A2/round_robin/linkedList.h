@@ -110,4 +110,7 @@ void printBackwards(List *list);
 int isEmpty(List *list);
 
 
+void batchProcessList(List *list, void (*updateFunction) (void * toBeUpdated));
+
+
 #endif

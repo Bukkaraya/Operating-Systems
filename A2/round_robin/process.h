@@ -7,7 +7,7 @@ typedef struct Process
     int id;
     int arrivalTime;
     int readyTime;
-    int blockedTime;
+    int pendTime;
     int cpuTime;
     int runTime;
     int numWaitTimes;
@@ -23,6 +23,8 @@ int compareProcess(const void* p1, const void* p2);
 void printInt(void* d);
 int compareInt(const void* a, const void* b);
 void deleteInt(void *d);
+void updatePendTime(void *p);
+void updateReadyTime(void *p);
 
 
 #endif

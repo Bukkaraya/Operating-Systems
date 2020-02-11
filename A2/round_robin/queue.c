@@ -31,7 +31,7 @@ int queueEmpty(Queue *q){
         return isEmpty(q->list);
     }
 
-    return 0;
+    return 1;
 }
 
 
@@ -81,5 +81,14 @@ int getCount(Queue *q){
 
 
 void printQueue(Queue *q) {
-    printForward(q->list);
+    printBackwards(q->list);
+}
+
+
+void batchProcessQueue(Queue *q, void (*updateFunction) (void * toBeUpdated)) {
+    if (q == NULL) {
+        return;
+    }
+
+    batchProcessList(q->list, updateFunction);
 }

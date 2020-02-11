@@ -19,7 +19,7 @@ int getTotalRunTime(Process *p) {
     int totalRunTime = 0;
     totalRunTime += p->cpuTime;
     totalRunTime += p->readyTime;
-    totalRunTime += p->blockedTime;
+    totalRunTime += p->pendTime;
 
     return totalRunTime;
 }
@@ -52,8 +52,8 @@ int compareInt(const void* a, const void* b) {
 
 void printProcess(void* p) {
     Process *proc = (Process *) p;
-    printf("Process<ID: %d, AT: %d, RT: %d, NWT: %d>\n", proc->id,
-        proc->arrivalTime, proc->runTime, proc->numWaitTimes);
+    printf("%d %d %d %d\n", proc->id,
+        proc->cpuTime, proc->readyTime, proc->pendTime);
 }
 
 void deleteProcess(void *p) {
@@ -74,4 +74,23 @@ int compareProcess(const void* p1, const void* p2) {
     } else {
         return -1;
     }
+}
+
+void updateReadyTime(void *p) {
+    if (p == NULL) {
+        return;
+    }
+
+    Process *proc = (Process *) p;
+    proc->readyTime++;
+}
+
+
+void updatePendTime(void *p) {
+    if (p == NULL) {
+        return;
+    }
+
+    Process *proc = (Process *) p;
+    proc->pendTime++;
 }

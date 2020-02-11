@@ -169,3 +169,18 @@ int isEmpty(List *list){
     }
     return 0;
 }
+
+
+void batchProcessList(List *list, void (*updateFunction) (void * toBeUpdated)) {
+    if (list == NULL) {
+        return;
+    }
+
+    Node *currentNode = list->head;
+
+    while(currentNode != NULL) {
+        updateFunction(currentNode->data);
+
+        currentNode = currentNode->next;
+    }
+}

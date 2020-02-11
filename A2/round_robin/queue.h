@@ -72,4 +72,6 @@ int getCount(Queue *q);
 
 void printQueue(Queue *q);
 
+void batchProcessQueue(Queue *q, void (*updateFunction) (void * toBeUpdated));
+
 #endif
