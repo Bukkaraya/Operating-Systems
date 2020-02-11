@@ -60,6 +60,10 @@ void dispatcher(FILE *fd, int quantum, int harddrive){
 
         // Add to ready queue if new process has arrived
         if (nextArrivalTime > 0 && tickCounter == nextArrivalTime) {
+            if (CPU.remainingTime == 0 && CPU.proc->id != 0) {
+                insert(readyQueue, CPU.proc);
+                CPU.proc = idleProcess;
+            }
             insert(readyQueue, pop(newQueue));
         }
 
