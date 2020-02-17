@@ -58,6 +58,8 @@ void printProcess(void* p) {
 
 void deleteProcess(void *p) {
     if (p != NULL) {
+        Process *proc = (Process *) p;
+        destroyQueue(proc->exchangeTimes);
         free(p);
     }
     // Add delete for wait time queue as well

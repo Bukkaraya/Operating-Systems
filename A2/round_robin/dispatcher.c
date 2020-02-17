@@ -147,6 +147,12 @@ void dispatcher(FILE *fd, int quantum, int harddrive){
     // printf("Finished Queue:\n");
     printQueue(finishedQueue);
 
+    destroyQueue(readyQueue);
+    destroyQueue(pendQueue);
+    destroyQueue(newQueue);
+    destroyQueue(finishedQueue);
+    deleteProcess(idleProcess);
+
 }
 
 

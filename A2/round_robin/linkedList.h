@@ -18,7 +18,6 @@ typedef struct listNode{
     void *data;
     struct listNode *previous;
     struct listNode *next;
-    int priority;
 } Node;
 
 /**
