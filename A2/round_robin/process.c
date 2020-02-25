@@ -10,6 +10,10 @@ Process* createProcess(int id, int arrivalTime, int runTime, Queue* exhangeTimes
     proc->runTime = runTime;
     proc->exchangeTimes = exhangeTimes;
     proc->numWaitTimes = getCount(proc->exchangeTimes);
+    proc->readyTime = 0;
+    proc->pendTime = 0;
+    proc->cpuTime = 0;
+    proc->remainingRunTime = 0;
 
     return proc;
 }

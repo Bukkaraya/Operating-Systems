@@ -60,6 +60,7 @@ void dispatcher(FILE *fd, int quantum, int harddrive){
 
         // Add to ready queue if new process has arrived
         if (nextArrivalTime > 0 && tickCounter == nextArrivalTime) {
+            // If the current running process is done add that to ready queue before adding the new process
             if (CPU.remainingTime == 0 && CPU.proc->id != 0) {
                 insert(readyQueue, CPU.proc);
                 CPU.proc = idleProcess;
@@ -67,12 +68,14 @@ void dispatcher(FILE *fd, int quantum, int harddrive){
             insert(readyQueue, pop(newQueue));
         }
 
+        // Get the next time process require harddrive
         int nextExchangeTime = -1;
         if(!queueEmpty(CPU.proc->exchangeTimes)) {
             int *exchangeTime = peek(CPU.proc->exchangeTimes);
             nextExchangeTime = *((int *) exchangeTime);
         }
 
+        // If the process requires the harddrive, add it to the pendQueue
         if (CPU.proc->cpuTime == nextExchangeTime) {
             deleteInt(pop(CPU.proc->exchangeTimes));
             insert(pendQueue, CPU.proc);
@@ -80,17 +83,21 @@ void dispatcher(FILE *fd, int quantum, int harddrive){
             CPU.proc = idleProcess;
         }
 
+        // Check if process is done running and add it to the finishedQueue
         if (CPU.proc->cpuTime == CPU.proc->runTime) {
             insert(finishedQueue, CPU.proc);
             CPU.proc = idleProcess;
         }
 
+        // If process is done with harddrive add it back to ready queue
         if (HDD.remainingTime == 0 && HDD.proc->id != 0) {
+            // If the process is done running after harddrive send it to the finished
             if (HDD.proc->runTime == HDD.proc->cpuTime) {
                 insert(finishedQueue, HDD.proc);
             } else {
                 insert(readyQueue, HDD.proc);
             }
+
             HDD.proc = idleProcess;
         }
 
@@ -101,9 +108,7 @@ void dispatcher(FILE *fd, int quantum, int harddrive){
         }
 
 
-
-        // Switch process if there are any in the ready queue, else continue running the current process
-
+        // If CPU is idle, then add process from ready queue
         if (CPU.proc->id == 0) {
             if(!queueEmpty(readyQueue)) {
                 CPU.proc = pop(readyQueue);
@@ -113,6 +118,7 @@ void dispatcher(FILE *fd, int quantum, int harddrive){
         }
 
 
+        // If HDD is idle, then add a process from pend queue
         if (HDD.proc->id == 0) {
             if(!queueEmpty(pendQueue)) {
                 HDD.proc = pop(pendQueue);
@@ -121,7 +127,8 @@ void dispatcher(FILE *fd, int quantum, int harddrive){
             HDD.remainingTime = harddrive;
         }
 
-
+        // Stop condition for the simulation
+        // When all queues are empty and both HDD and CPU are idle the simulation stops
         if(queueEmpty(newQueue) && queueEmpty(readyQueue) && queueEmpty(pendQueue)) {
             if(CPU.proc->id == 0 && HDD.proc->id == 0) {
                 break;
@@ -141,10 +148,8 @@ void dispatcher(FILE *fd, int quantum, int harddrive){
         batchProcessQueue(pendQueue, updatePendTime);
     }
 
-    // printf("TC: %d\n", tickCounter);
-    // printf("IDLE PROCESS:\n");
+
     printf("0 %d\n", idleProcess->cpuTime);
-    // printf("Finished Queue:\n");
     printQueue(finishedQueue);
 
     destroyQueue(readyQueue);
