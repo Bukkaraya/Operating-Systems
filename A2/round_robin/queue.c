@@ -1,3 +1,7 @@
+// Author: Abinav Bukkaraya
+// ID: 0951030
+// This code was written by the author in data structures course CIS 2520 Course in Fall 2017
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

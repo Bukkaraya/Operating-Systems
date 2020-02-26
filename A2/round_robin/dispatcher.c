@@ -26,7 +26,6 @@ void getSimulationData(FILE* fd, Queue* newQueue);
 int getNextArrivalTime(Queue* newQueue);
 
 
-
 void dispatcher(FILE *fd, int quantum, int harddrive){
     // Tick Counter, this is the global time for the simulation
     int tickCounter = 0;
@@ -58,22 +57,29 @@ void dispatcher(FILE *fd, int quantum, int harddrive){
     while(1) {
         nextArrivalTime = getNextArrivalTime(newQueue);
 
-        // Add to ready queue if new process has arrived
-        if (nextArrivalTime > 0 && tickCounter == nextArrivalTime) {
-            // If the current running process is done add that to ready queue before adding the new process
-            if (CPU.remainingTime == 0 && CPU.proc->id != 0) {
-                insert(readyQueue, CPU.proc);
-                CPU.proc = idleProcess;
-            }
-            insert(readyQueue, pop(newQueue));
-        }
-
         // Get the next time process require harddrive
         int nextExchangeTime = -1;
         if(!queueEmpty(CPU.proc->exchangeTimes)) {
             int *exchangeTime = peek(CPU.proc->exchangeTimes);
             nextExchangeTime = *((int *) exchangeTime);
         }
+
+        // Add to ready queue if new process has arrived
+        if (nextArrivalTime > 0 && tickCounter == nextArrivalTime) {
+            // If the current running process is done add that to ready queue before adding the new process
+            if (CPU.remainingTime == 0 && CPU.proc->id != 0) {
+                // Check if current process requires harddisk and insert appropriately
+                if(nextExchangeTime == CPU.proc->cpuTime) {
+                    insert(pendQueue, CPU.proc);
+                } else {
+                    insert(readyQueue, CPU.proc);
+                }
+                CPU.proc = idleProcess;
+            }
+            insert(readyQueue, pop(newQueue));
+        }
+
+
 
         // If the process requires the harddrive, add it to the pendQueue
         if (CPU.proc->cpuTime == nextExchangeTime) {
