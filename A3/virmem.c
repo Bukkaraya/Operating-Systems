@@ -5,9 +5,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "queue.h"
 
 #define MAX_ARRAY_LEN 1000
-#define MAX_TLB_LEN 16
+#define TLB_SIZE 16
 #define NUM_PAGES 256
 #define NUM_FRAMES 256
 #define PAGE_SIZE 256
@@ -40,19 +41,38 @@ typedef struct memory {
 } Memory;
 
 
+typedef struct tlbcell {
+    int frameNumber;
+    int pageNumber;
+} TLBCell;
+
+
 
 PageDetails getPageDetails(int address);
 FILE* getBackingStorage(char* fileName);
 void fetchPage(FILE* storage, Memory* memory, int pageNumber, PageTableCell pageTable[]);
 char getValueFromMemory(int address, Memory* memory);
-int getFrameAddress(int pageNumber, PageTableCell pageTable[]);
+int getFrameAddress(int pageNumber, PageTableCell pageTable[], Queue* TLB);
+
+// TLB Cell Helper Functions
+void printTLBCell(void* data);
+int compareTLBCell(const void* a, const void* b);
+void deleteTLBCell(void* data);
+TLBCell* createTLBCell(int pageNumber, int frameNumber);
+int isTLBFull(Queue* TLB);
+
 
 
 int main(int argc, char* argv[]) {
 
     PageTableCell pageTable[NUM_PAGES] = {0};
+
+    // Allocate Memory
     Memory* memory = malloc(sizeof(Memory));
     memory->pointer = 0;
+
+    // TLB Allocation
+    Queue* TLB = createQueue(printTLBCell, deleteTLBCell, compareTLBCell);
 
     if(argc < 2) {
         // TODO: Print this to stderr
@@ -84,7 +104,6 @@ int main(int argc, char* argv[]) {
     FILE* backingStorage = getBackingStorage(storageFileName);
 
     int numPageFaults = 0;
-    int memoryPointer = 0;
     char valueAtAddress = '\0';
     int physicalAddress = 0;
 
@@ -98,21 +117,45 @@ int main(int argc, char* argv[]) {
             fetchPage(backingStorage, memory, pageDetails.pageNumber, pageTable);
         }
 
-        physicalAddress = getFrameAddress(pageDetails.pageNumber, pageTable) + pageDetails.offset;
+        physicalAddress = getFrameAddress(pageDetails.pageNumber, pageTable, TLB) + pageDetails.offset;
         valueAtAddress = getValueFromMemory(physicalAddress, memory);
         
         printf("Virtual address: %d Physical address: %d Value: %d\n", addresses[i], physicalAddress, valueAtAddress);
     }
 
+    printf("Number of Translated Address: %d.\n", numAddresses);
     printf("Number of Page Faults: %d\n", numPageFaults);
+    printf("Number of TLB Hits: %d\n", TLB->hitCount);
 
+    free(memory);
     fclose(backingStorage);
 
     return 0;
 }
 
-int getFrameAddress(int pageNumber, PageTableCell pageTable[]) {
-    return pageTable[pageNumber].frameNumber;
+int getFrameAddress(int pageNumber, PageTableCell pageTable[], Queue* TLB) {
+    // Check if TLB has the value and if it doesn't load it into the TLB
+    TLBCell* cellToSearch = createTLBCell(pageNumber, 0);
+    TLBCell* foundItem = (TLBCell *) searchQueue(TLB, cellToSearch);
+
+    int frameNumber = 0;
+
+    if(foundItem == NULL) {
+        if(isTLBFull(TLB)) {
+            void* cell = pop(TLB);
+            deleteTLBCell(cell);
+        }
+
+        frameNumber = pageTable[pageNumber].frameNumber;
+        cellToSearch->frameNumber = frameNumber;
+        
+        insert(TLB, cellToSearch); 
+    } else {
+        frameNumber =  foundItem->frameNumber;
+        TLB->hitCount++;
+    }
+
+    return frameNumber;
 }
 
 char getValueFromMemory(int address, Memory* memory) {
@@ -171,4 +214,59 @@ FILE* getBackingStorage(char* fileName) {
     }
 
     return fp;
+}
+
+
+void printTLBCell(void* data) {
+    if (data == NULL) {
+        return;
+    }
+
+    TLBCell* cell = (TLBCell *) data;
+
+    printf("TLB<Frame: %d, Page: %d>", cell->frameNumber, cell->pageNumber);
+}
+
+
+TLBCell* createTLBCell(int pageNumber, int frameNumber) {
+    TLBCell* newCell = malloc(sizeof(TLBCell));
+    newCell->pageNumber = pageNumber;
+    newCell->frameNumber = frameNumber;
+
+    return newCell;
+}
+
+
+int compareTLBCell(const void* a, const void* b) {
+    if(a == NULL || b == NULL) {
+        return -1;
+    }
+
+    TLBCell* c1 = (TLBCell *) a;
+    TLBCell* c2 = (TLBCell *) b;
+
+    if(c1->pageNumber > c2->pageNumber) {
+        return 1;
+    } else if(c1->pageNumber < c2->pageNumber) {
+        return -1;
+    }
+
+    return 0;
+}
+
+
+void deleteTLBCell(void* data) {
+    if(data == NULL) {
+        return;
+    }
+
+    free(data);
+}
+
+int isTLBFull(Queue* TLB) {
+    if(TLB->count >= TLB_SIZE) {
+        return TRUE;
+    }
+
+    return FALSE;       
 }
