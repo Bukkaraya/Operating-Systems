@@ -126,9 +126,11 @@ int main(int argc, char* argv[]) {
     printf("Number of Translated Address: %d.\n", numAddresses);
     printf("Number of Page Faults: %d\n", numPageFaults);
     printf("Number of TLB Hits: %d\n", TLB->hitCount);
+    
 
     free(memory);
     fclose(backingStorage);
+    destroyQueue(TLB);
 
     return 0;
 }
@@ -153,6 +155,7 @@ int getFrameAddress(int pageNumber, PageTableCell pageTable[], Queue* TLB) {
     } else {
         frameNumber =  foundItem->frameNumber;
         TLB->hitCount++;
+        free(cellToSearch);
     }
 
     return frameNumber;
