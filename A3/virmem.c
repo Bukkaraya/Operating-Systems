@@ -148,7 +148,7 @@ int main(int argc, char* argv[]) {
         printf("Virtual address: %d Physical address: %d Value: %d\n", addresses[i], physicalAddress, valueAtAddress);
     }
 
-    printf("Number of Translated Address = %d.\n", numAddresses);
+    printf("Number of Translated Address = %d\n", numAddresses);
     fprintf(stderr, "Page Faults = %d\n", numPageFaults);
     fprintf(stderr, "Page Fault Rate = %.3f\n", (float) numPageFaults / numAddresses);
     fprintf(stderr, "TLB Hits = %d\n", TLB->hitCount);
