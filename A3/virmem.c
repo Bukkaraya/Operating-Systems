@@ -88,6 +88,20 @@ int main(int argc, char* argv[]) {
 
     PageTableCell pageTable[NUM_PAGES] = {0};
 
+    if(argc < 2) {
+        fprintf(stderr, "No file given.\n");
+        exit_with_failure(argv[0]);
+    }
+
+    FILE* fp = NULL;
+    fp = fopen(argv[1], "r");
+
+    if(fp == NULL) {
+        fprintf(stderr, "Invalid File.\n");
+        exit_with_failure(argv[0]);
+    }
+
+
     // Allocate Memory
     Memory* memory = malloc(sizeof(Memory));
     memory->pointer = 0;
@@ -96,19 +110,8 @@ int main(int argc, char* argv[]) {
     Queue* TLB = createQueue(printTLBCell, deleteTLBCell, compareTLBCell);
 
     // Check for proper args
-    if(argc < 2) {
-        fprintf(stderr, "No file given.\n");
-        exit_with_failure(argv[0]);
-    }
 
-    FILE* fp = NULL;
 
-    fp = fopen(argv[1], "r");
-
-    if(fp == NULL) {
-        fprintf(stderr, "Invalid File.\n");
-        exit_with_failure(argv[0]);
-    }
 
     int addresses[MAX_ARRAY_LEN];
     int numAddresses = 0;
