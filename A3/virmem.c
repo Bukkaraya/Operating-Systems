@@ -86,7 +86,7 @@ void exit_with_failure(char* programName);
 
 int main(int argc, char* argv[]) {
 
-    PageTableCell pageTable[NUM_PAGES] = {0};
+    PageTableCell pageTable[NUM_PAGES] = {{0}};
 
     if(argc < 2) {
         fprintf(stderr, "No file given.\n");
