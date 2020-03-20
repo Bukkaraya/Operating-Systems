@@ -7,3 +7,6 @@ ibadcnt: ibadcnt.c
 
 igoodcnt: igoodcnt.c
 	gcc -o $@ $< -lpthread -lrt
+
+clean:
+	rm -rf ibadcnt igoodcnt
